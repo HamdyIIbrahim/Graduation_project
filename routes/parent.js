@@ -6,6 +6,7 @@ const { body } = require("express-validator");
 const Parent = require("../models/parent");
 const Child = require("../models/child");
 
+// parent sign up to create his account and another to one child
 router.post(
   "/signup",
   body("email")
@@ -69,17 +70,18 @@ router.post(
     }
   }
 );
+// parent login to the application and i will return a token as a json object and message
 router.post("/login", (req, res) => {
   let fetchedParent;
 
-    Parent.findOne({ email: req.body.email })
+  Parent.findOne({ email: req.body.email })
     .then((parent) => {
       if (!parent) {
         return res.status(401).json({
           message: "Auth failed, No Parent by this email!",
         });
       }
-        fetchedParent = parent;
+      fetchedParent = parent;
 
       return bcrypt.compareSync(req.body.password, parent.password);
     })
@@ -106,6 +108,44 @@ router.post("/login", (req, res) => {
         .status(500)
         .json({ message: "Invalid Authentication Credentials!" });
     });
+});
+//parent will add a new child and i need from the front jwt from headers as authorization variable
+router.post(
+  "/addchild",
+  body("childName")
+    .trim()
+    .custom(async (value) => {
+      const child = await Child.findone({ childName: value });
+      if (child) {
+        return Promise.reject("Child name already in use");
+      }
+    }),
+  async (req, res) => {
+    const { childName, childPassword, childGender, childAge } = req.body;
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const resChild = await Child.create({
+      childName: childName,
+      childPassword: bcrypt.hashSync(childPassword, 12),
+      childGender: childGender,
+      childAge: childAge,
+      parentId: decodedToken.parentId,
+    });
+    if (resChild) {
+      res.status(200).json("Child added successfully");
+    }
+    res.status(500).json("Can't add Child please try again");
+  }
+);
+// end point to find all childs related to current parent
+router.get('/allchilds',async (req,res)=>{
+    const token = req.headers.authorization.split(" ")[1];
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const allChilds = await Child.find({parentId:decodedToken.parentId});
+    if(allChilds){
+        res.status(200).json(allChilds);
+    }
+    res.status(500).json("no childs found");
 });
 
 module.exports = router;
