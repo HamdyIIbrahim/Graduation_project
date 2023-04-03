@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 const parentRoute =require('./routes/parent');
+const childRoute = require('./routes/child')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,5 +22,6 @@ app.get('/',(req,res)=>{
 });
 
 app.use('/parent',parentRoute);
+app.use('/child',childRoute);
 
 app.listen(2000);
