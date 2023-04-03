@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
+const parentRoute =require('./routes/parent');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -18,5 +19,7 @@ mongoose.connect(`${process.env.DB_URL_CONNECTION}`).then(() => {
 app.get('/',(req,res)=>{
     res.json('welcome from home page')
 });
+
+app.use('/parent',parentRoute);
 
 app.listen(2000);

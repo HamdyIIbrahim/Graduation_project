@@ -5,7 +5,6 @@ const parentSchema = mongoose.Schema({
   email: { 
     type: String, 
     required: true, 
-    unique: true 
 },
   password: { 
     type: String, 
@@ -16,9 +15,10 @@ parentName: {
     required: true 
 },
   gender:{
-    type:string,
+    type:String,
     required: true 
   },
+  
 });
 
 parentSchema.plugin(uniqueValidator);

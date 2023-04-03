@@ -3,23 +3,27 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const childSchema = mongoose.Schema({
     childName:{
-        type:string,
+        type:String,
         required:true,
         unique:true
     },
     childPassword:{
-        type:string,
+        type:String,
         required:true,
         unique:true
     },
     childGender:{
-        type:string,
+        type:String,
         required:true,
     },
     childAge:{
-        type:number,
+        type:Number,
         required:true,
     },
+    parentId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Child"
+    }
 });
 
 childSchema.plugin(uniqueValidator);
