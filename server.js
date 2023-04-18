@@ -5,7 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 const parentRoute =require('./routes/parent');
 const childRoute = require('./routes/child')
-
+const adminRoute = require('./routes/admin')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -23,5 +23,6 @@ app.get('/',(req,res)=>{
 
 app.use('/parent',parentRoute);
 app.use('/child',childRoute);
+app.use('/admin',adminRoute);
 
 app.listen(2000);

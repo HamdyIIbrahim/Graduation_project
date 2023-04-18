@@ -145,7 +145,7 @@ router.get('/allchilds',async (req,res)=>{
     if(allChilds){
         res.status(200).json(allChilds);
     }
-    res.status(500).json("no childs found");
+    res.status(500).json("no childs founded");
 });
 
 module.exports = router;
