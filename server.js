@@ -6,6 +6,7 @@ require("dotenv").config();
 const parentRoute =require('./routes/parent');
 const childRoute = require('./routes/child')
 const adminRoute = require('./routes/admin')
+const Exam = require('./models/exam')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -17,8 +18,13 @@ mongoose.connect(`${process.env.DB_URL_CONNECTION}`).then(() => {
     console.log("can't connect");
 });
 
-app.get('/',(req,res)=>{
-    res.json('welcome from home page')
+app.get('/exam',async (req,res)=>{
+    const exam = await Exam.find()
+    if(exam){
+        res.status(200).json(exam)
+    }else{
+        res.status(500).json('exam not found')
+    }
 });
 
 app.use('/parent',parentRoute);

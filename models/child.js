@@ -21,7 +21,8 @@ const childSchema = mongoose.Schema({
     parentId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Child"
-    }
+    },
+    examScore:Number
 });
 
 childSchema.plugin(uniqueValidator);
