@@ -5,12 +5,10 @@ const childSchema = mongoose.Schema({
     childName:{
         type:String,
         required:true,
-        unique:true
     },
     childPassword:{
         type:String,
         required:true,
-        unique:true
     },
     childGender:{
         type:String,

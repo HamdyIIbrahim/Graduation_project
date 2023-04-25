@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -7,6 +7,8 @@ const { body } = require("express-validator");
 const Admin = require("../models/admin");
 const Parent = require("../models/parent");
 const Child = require("../models/child");
+const AdminController = require("../controllers/parent");
+const Exam = require("../models/exam");
 
 router.post(
   "/signup",
@@ -18,22 +20,10 @@ router.post(
     .custom(async (emailValue) => {
       const admin = await Admin.findOne({ email: emailValue });
       if (admin) {
-        return Promise.reject("E-mail already in use by another customer");
+        return Promise.reject("E-mail already in use by another admin");
       }
     }),
-  async (req, res) => {
-    const { email, password, gender, userName } = req.body;
-    if (email && password && gender && userName) {
-      await Admin.create({
-        email: email,
-        password: bcrypt.hashSync(password, 12),
-        gender: gender,
-        userName: userName,
-      }).then(() => {
-        res.json("account created successfully");
-      });
-    }
-  }
+  AdminController.adminSignup
 );
 
 router.post("/login", (req, res) => {
@@ -165,72 +155,77 @@ router.post(
   }
 );
 
-router.get('/allchilds',async (req,res)=>{
-    const allChilds = await Child.find();
-    if(allChilds){
-        res.status(200).json(allChilds);
-    }
-    res.status(500).json("no childs founded");
+router.get("/allchilds", async (req, res) => {
+  const allChilds = await Child.find();
+  if (allChilds) {
+    res.status(200).json(allChilds);
+  }
+  res.status(500).json("no childs founded");
 });
 
-router.get('/allparents',async (req,res)=>{
-    const allparents = await Parent.find();
-    if(allparents){
-        res.status(200).json(allparents);
-    }
-    res.status(500).json("no parents founded");
+router.get("/allparents", async (req, res) => {
+  const allparents = await Parent.find();
+  if (allparents) {
+    res.status(200).json(allparents);
+  }
+  res.status(500).json("no parents founded");
 });
 
-router.post('/deleteparent',async (req,res)=>{
-    const{Id}= req.body;
-    const result = await Child.find({parentId:Id});
-    res.status(200).json(result)
+router.post("/deleteparent", async (req, res) => {
+  const { Id } = req.body;
+  const result = await Child.find({ parentId: Id });
+  let isDeleted = true;
+  if (result) {
+    result.forEach(async (child) => {
+      console.log(child._id);
+      isDeleted = await Child.findByIdAndDelete(child._id);
+    });
+  }
+  if (isDeleted) {
+    Parent.findByIdAndDelete(Id).then(() => {
+      res.status(200).json({ message: "Parent deleted successfully" });
+    });
+  } else {
+    res.status(500).json({ message: "no parent founded with this Id" });
+  }
+});
 
-    // const result = await Parent.findByIdAndDelete({ _id:Id})
-    // if(result){
-    //     return res.status(200).json({message:"Parent deleted successfully"})
-    // }
-})
+router.post("/deletechild", async (req, res) => {
+  const Id = req.body;
+  const result = await Child.findByIdAndDelete(Id);
 
-router.post('/deletechild',async (req,res)=>{
-    const Id = req.body;
-    const result = await Child.findByIdAndDelete(Id)
+  if (result) {
+    return res.status(200).json({ message: "Child deleted successfully" });
+  }
+});
 
-    if(result){
-        return res.status(200).json({message:"Child deleted successfully"})
-    }
-})
+router.post("/addexam", async (req, res) => {
+  const {
+    question1,
+    question2,
+    question3,
+    question4,
+    question5,
+    question6,
+    question7,
+    question8,
+    question9,
+  } = req.body;
+  const createExam = await Exam.create({
+    question1,
+    question2,
+    question3,
+    question4,
+    question5,
+    question6,
+    question7,
+    question8,
+    question9,
+  });
+  if (createExam) {
+    res.status(200).json("Exam created successfully");
+  } else {
+    res.status(500).json("Exam not created");
+  }
+});
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// router.post('/deleteparent',async (req,res)=>{
-//     const Id = req.body;
-//     const result = await Parent.findByIdAndDelete({ _id:Id})
-
-//     if(result){
-//         return res.status(200).json({message:"Parent deleted successfully"})
-//     }
-// })

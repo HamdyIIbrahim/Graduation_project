@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const { body } = require("express-validator");
 const Parent = require("../models/parent");
 const Child = require("../models/child");
-
+const ParentController =require('../controllers/parent')
 // parent sign up to create his account and another to one child
 router.post(
   "/signup",
@@ -17,58 +17,20 @@ router.post(
     .custom(async (emailValue) => {
       const parent = await Parent.findOne({ email: emailValue });
       if (parent) {
+        // console.log(parent)
         return Promise.reject("E-mail already in use by another customer");
       }
     }),
   body("childName")
     .trim()
     .custom(async (value) => {
-      const child = await Child.findone({ childName: value });
+      const child = await Child.findOne({ childName: value });
       if (child) {
+        // console.log(child)
         return Promise.reject("Child name already in use");
       }
     }),
-  async (req, res) => {
-    const {
-      email,
-      password,
-      parentName,
-      gender,
-      childName,
-      childPassword,
-      childGender,
-      childAge,
-    } = req.body;
-    if (
-      email &&
-      password &&
-      parentName &&
-      gender &&
-      childName &&
-      childPassword &&
-      childGender &&
-      childAge
-    ) {
-      await Parent.create({
-        email: email,
-        password: bcrypt.hashSync(password, 12),
-        parentName: parentName,
-        gender: gender,
-      })
-        .then((result) => {
-          Child.create({
-            childName: childName,
-            childPassword: bcrypt.hashSync(childPassword, 12),
-            childGender: childGender,
-            childAge: childAge,
-            parentId: result._id,
-          });
-        })
-        .then(() => {
-          res.json("Created successfully");
-        });
-    }
-  }
+    ParentController.createParent
 );
 // parent login to the application and i will return a token as a json object and message
 router.post("/login", (req, res) => {
