@@ -43,4 +43,123 @@ router.post("/login", (req, res) => {
     });
 });
 
+router.post('/:userId/friend-requests', async (req, res) => {
+  const { userId } = req.params;
+  const { friendId } = req.body;
+  try {
+    const user = await Child.findById(userId);
+    console.log(user)
+    if (!user) {
+      return res.status(404).send({ message: 'Child not found' });
+    }
+
+    const friend = await Child.findById(friendId);
+    console.log(friend)
+    if (!friend) {
+      return res.status(404).send({ message: 'Friend not found' });
+    }
+    const existingRequest = user.friendsRequests.find(id => id.equals(friendId));
+    if (existingRequest) {
+      return res.status(400).send({ message: 'Friend request already sent' });
+    }
+
+    user.friendsRequests.push(friendId);
+    await user.save();
+
+    res.send({ message: 'Friend request sent' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+// To accept a friend request 
+router.put('/:userId/friend-requests/:friendId', async (req, res) => {
+  const { userId, friendId } = req.params;
+
+  try {
+    const user = await Child.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: 'Child not found' });
+    }
+
+    const friend = await Child.findById(friendId);
+    if (!friend) {
+      return res.status(404).send({ message: 'Friend not found' });
+    }
+
+    const requestIndex = user.friendsRequests.findIndex(id => id.equals(friendId));
+    if (requestIndex === -1) {
+      return res.status(400).send({ message: 'Friend request not found' });
+    }
+
+    user.friendsRequests.splice(requestIndex, 1);
+    user.friends.push(friendId);
+    await user.save();
+
+    friend.friends.push(userId);
+    await friend.save();
+
+    res.send({ message: 'Friend request accepted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+// canecl request
+
+router.delete('/:userId/friend-requests/:friendId', async (req, res) => {
+  const { userId, friendId } = req.params;
+
+  try {
+    const user = await Child.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: 'Child not found' });
+    }
+
+    const requestIndex = user.friendsRequests.findIndex(id => id.equals(friendId));
+    if (requestIndex === -1) {
+      return res.status(400).send({ message: 'Friend request not found' });
+    }
+
+    user.friendsRequests.splice(requestIndex, 1);
+    await user.save();
+
+    res.send({ message: 'Friend request deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Server error' });
+  }
+});
+
+router.delete('/:userId/delete-friend/:friendId',async (req,res)=>{
+  const { userId, friendId } = req.params;
+
+  try {
+    const user = await Child.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: 'Child not found' });
+    }
+
+    const friend = await Child.findById(friendId);
+    if (!friend) {
+      return res.status(404).send({ message: 'Friend not found' });
+    }
+    const requestIndex = user.friends.findIndex(id => id.equals(friendId));
+    if (requestIndex === -1) {
+      return res.status(400).send({ message: 'Friend request not found' });
+    }
+
+    user.friends.splice(requestIndex, 1);
+    await user.save();
+
+    friend.friends.splice(requestIndex, 1);
+    await friend.save();
+
+    res.send({ message: 'Friend deleted successfully' });
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).send({ message: 'Server error' });
+  }
+})
 module.exports = router;
