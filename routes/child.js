@@ -43,53 +43,55 @@ router.post("/login", (req, res) => {
     });
 });
 
-router.post('/:userId/friend-requests', async (req, res) => {
+router.post("/:userId/friend-requests", async (req, res) => {
   const { userId } = req.params;
   const { friendId } = req.body;
   try {
     const user = await Child.findById(userId);
-    console.log(user)
     if (!user) {
-      return res.status(404).send({ message: 'Child not found' });
+      return res.status(404).send({ message: "Child not found" });
     }
 
     const friend = await Child.findById(friendId);
-    console.log(friend)
     if (!friend) {
-      return res.status(404).send({ message: 'Friend not found' });
+      return res.status(404).send({ message: "Friend not found" });
     }
-    const existingRequest = user.friendsRequests.find(id => id.equals(friendId));
+    const existingRequest = user.friendsRequests.find((id) =>
+      id.equals(friendId)
+    );
     if (existingRequest) {
-      return res.status(400).send({ message: 'Friend request already sent' });
+      return res.status(400).send({ message: "Friend request already sent" });
     }
 
     user.friendsRequests.push(friendId);
     await user.save();
 
-    res.send({ message: 'Friend request sent' });
+    res.send({ message: "Friend request sent" });
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: 'Server error' });
+    res.status(500).send({ message: "Server error" });
   }
 });
-// To accept a friend request 
-router.put('/:userId/friend-requests/:friendId', async (req, res) => {
+// To accept a friend request
+router.put("/:userId/friend-requests/:friendId", async (req, res) => {
   const { userId, friendId } = req.params;
 
   try {
     const user = await Child.findById(userId);
     if (!user) {
-      return res.status(404).send({ message: 'Child not found' });
+      return res.status(404).send({ message: "Child not found" });
     }
 
     const friend = await Child.findById(friendId);
     if (!friend) {
-      return res.status(404).send({ message: 'Friend not found' });
+      return res.status(404).send({ message: "Friend not found" });
     }
 
-    const requestIndex = user.friendsRequests.findIndex(id => id.equals(friendId));
+    const requestIndex = user.friendsRequests.findIndex((id) =>
+      id.equals(friendId)
+    );
     if (requestIndex === -1) {
-      return res.status(400).send({ message: 'Friend request not found' });
+      return res.status(400).send({ message: "Friend request not found" });
     }
 
     user.friendsRequests.splice(requestIndex, 1);
@@ -99,54 +101,56 @@ router.put('/:userId/friend-requests/:friendId', async (req, res) => {
     friend.friends.push(userId);
     await friend.save();
 
-    res.send({ message: 'Friend request accepted' });
+    res.send({ message: "Friend request accepted" });
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: 'Server error' });
+    res.status(500).send({ message: "Server error" });
   }
 });
 // canecl request
 
-router.delete('/:userId/friend-requests/:friendId', async (req, res) => {
+router.delete("/:userId/friend-requests/:friendId", async (req, res) => {
   const { userId, friendId } = req.params;
 
   try {
     const user = await Child.findById(userId);
     if (!user) {
-      return res.status(404).send({ message: 'Child not found' });
+      return res.status(404).send({ message: "Child not found" });
     }
 
-    const requestIndex = user.friendsRequests.findIndex(id => id.equals(friendId));
+    const requestIndex = user.friendsRequests.findIndex((id) =>
+      id.equals(friendId)
+    );
     if (requestIndex === -1) {
-      return res.status(400).send({ message: 'Friend request not found' });
+      return res.status(400).send({ message: "Friend request not found" });
     }
 
     user.friendsRequests.splice(requestIndex, 1);
     await user.save();
 
-    res.send({ message: 'Friend request deleted' });
+    res.send({ message: "Friend request deleted" });
   } catch (err) {
     console.error(err);
-    res.status(500).send({ message: 'Server error' });
+    res.status(500).send({ message: "Server error" });
   }
 });
 
-router.delete('/:userId/delete-friend/:friendId',async (req,res)=>{
+router.delete("/:userId/delete-friend/:friendId", async (req, res) => {
   const { userId, friendId } = req.params;
 
   try {
     const user = await Child.findById(userId);
     if (!user) {
-      return res.status(404).send({ message: 'Child not found' });
+      return res.status(404).send({ message: "Child not found" });
     }
 
     const friend = await Child.findById(friendId);
     if (!friend) {
-      return res.status(404).send({ message: 'Friend not found' });
+      return res.status(404).send({ message: "Friend not found" });
     }
-    const requestIndex = user.friends.findIndex(id => id.equals(friendId));
+    const requestIndex = user.friends.findIndex((id) => id.equals(friendId));
     if (requestIndex === -1) {
-      return res.status(400).send({ message: 'Friend request not found' });
+      return res.status(400).send({ message: "Friend request not found" });
     }
 
     user.friends.splice(requestIndex, 1);
@@ -155,11 +159,34 @@ router.delete('/:userId/delete-friend/:friendId',async (req,res)=>{
     friend.friends.splice(requestIndex, 1);
     await friend.save();
 
-    res.send({ message: 'Friend deleted successfully' });
-  }
-  catch(err){
+    res.send({ message: "Friend deleted successfully" });
+  } catch (err) {
     console.error(err);
-    res.status(500).send({ message: 'Server error' });
+    res.status(500).send({ message: "Server error" });
   }
-})
+});
+// get all friends for spacific user 
+router.post("/allfriends", async (req, res) => {
+  const { userId } = req.body;
+  let allFriendsArray = [];
+  try {
+    const user = await Child.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: "Child not found" });
+    }
+    const allFriends = user.friends;
+    if (allFriends) {
+      for (let i = 0; i < allFriends.length; i++) {
+        const result = await Child.findById(allFriends[i]);
+        allFriendsArray.push(result);
+        if (i === allFriends.length - 1) {
+          res.status(200).json(allFriendsArray);
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Server error" });
+  }
+});
 module.exports = router;
