@@ -191,8 +191,8 @@ router.post("/deleteparent", async (req, res) => {
 });
 
 router.post("/deletechild", async (req, res) => {
-  const Id = req.body;
-  Child.findByIdAndDelete(Id).then(() => {
+  const {Id} = req.body;
+  await Child.findByIdAndDelete(Id).then(() => {
     res.status(200).json({ message: "Child deleted successfully" });
   }).catch(()=>{
     res.status(500).json({ message: "no child founded with this Id" });
