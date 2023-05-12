@@ -183,6 +183,8 @@ router.post("/allfriends", async (req, res) => {
           res.status(200).json(allFriendsArray);
         }
       }
+    }else{
+      res.status(500).send({ message: "This child doesn't have any friends" });
     }
   } catch (err) {
     console.error(err);
