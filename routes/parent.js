@@ -109,5 +109,13 @@ router.get('/allchilds',async (req,res)=>{
     }
     res.status(500).json("no childs founded");
 });
-
+router.get('/:id',async (req,res)=>{
+  const Id =req.params.id;
+  const parentData = await Parent.findById(Id);
+  if(parentData){
+    res.status(200).json(parentData);
+  }else{
+    res.status(500).json("No data found to this parent")
+  }
+})
 module.exports = router;
