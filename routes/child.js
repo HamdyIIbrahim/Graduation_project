@@ -175,7 +175,7 @@ router.post("/allfriends", async (req, res) => {
       return res.status(404).send({ message: "Child not found" });
     }
     const allFriends = user.friends;
-    if (allFriends) {
+    if (allFriends.length > 0) {
       for (let i = 0; i < allFriends.length; i++) {
         const result = await Child.findById(allFriends[i]);
         allFriendsArray.push(result);
