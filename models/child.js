@@ -22,7 +22,7 @@ const childSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Child",
   },
-  examScore: Number,
+  examScore: String,
   friends: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Child'
