@@ -56,15 +56,15 @@ router.post("/:userId/friend-requests", async (req, res) => {
     if (!friend) {
       return res.status(404).send({ message: "Friend not found" });
     }
-    const existingRequest = user.friendsRequests.find((id) =>
+    const existingRequest = friend.friendsRequests.find((id) =>
       id.equals(friendId)
     );
     if (existingRequest) {
       return res.status(400).send({ message: "Friend request already sent" });
     }
 
-    user.friendsRequests.push(friendId);
-    await user.save();
+    friend.friendsRequests.push(friendId);
+    await friend.save();
 
     res.send({ message: "Friend request sent" });
   } catch (err) {
