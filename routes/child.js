@@ -191,4 +191,29 @@ router.post("/allfriends", async (req, res) => {
     res.status(500).send({ message: "Server error" });
   }
 });
+router.post("/friendrequests", async (req, res) => {
+  const { userId } = req.body;
+  let allFriendsArray = [];
+  try {
+    const user = await Child.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: "Child not found" });
+    }
+    const allFriends = user.friendsRequests;
+    if (allFriends.length > 0) {
+      for (let i = 0; i < allFriends.length; i++) {
+        const result = await Child.findById(allFriends[i]);
+        allFriendsArray.push(result);
+        if (i === allFriends.length - 1) {
+          res.status(200).json(allFriendsArray);
+        }
+      }
+    }else{
+      res.status(500).send({ message: "This child doesn't have any friend requests" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Server error" });
+  }
+});
 module.exports = router;
