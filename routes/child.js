@@ -63,7 +63,7 @@ router.post("/:userId/friend-requests", async (req, res) => {
       return res.status(400).send({ message: "Friend request already sent" });
     }
 
-    friend.friendsRequests.push(friendId);
+    friend.friendsRequests.push(userId);
     await friend.save();
 
     res.send({ message: "Friend request sent" });
