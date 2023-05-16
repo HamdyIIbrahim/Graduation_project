@@ -149,14 +149,17 @@ router.delete("/:userId/delete-friend/:friendId", async (req, res) => {
       return res.status(404).send({ message: "Friend not found" });
     }
     const requestIndex = user.friends.findIndex((id) => id.equals(friendId));
+    const requestIndex2 = friend.friends.findIndex((id) => id.equals(userId));
     if (requestIndex === -1) {
       return res.status(400).send({ message: "Friend request not found" });
     }
-
+    if (requestIndex2 === -1) {
+      return res.status(400).send({ message: "Friend request not found" });
+    }
     user.friends.splice(requestIndex, 1);
     await user.save();
 
-    friend.friends.splice(requestIndex, 1);
+    friend.friends.splice(requestIndex2, 1);
     await friend.save();
 
     res.send({ message: "Friend deleted successfully" });
