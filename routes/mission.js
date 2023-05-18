@@ -22,7 +22,7 @@ router.get("/missionlist", async (req, res) => {
       let missionsList = [];
       for (let k = 0; k < Missions.length; k++) {
         const newArrayData = Missions[k];
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
           for (let j = 0; j < newArrayData[`planet${i}`].length; j++) {
             missionsList.push(newArrayData[`planet${i}`][j]);
           }
@@ -39,8 +39,8 @@ router.get("/missionlist", async (req, res) => {
 });
 
 router.post("/newmission", async (req, res) => {
-  const { grade, planet1, planet2, planet3 } = req.body;
-  const NewMisson = await Mission.create({ grade, planet1, planet2, planet3 });
+  const { grade, planet1, planet2, planet3,planet4 } = req.body;
+  const NewMisson = await Mission.create({ grade, planet1, planet2, planet3,planet4 });
   if (NewMisson) {
     res.status(200).json({ message: "Mission Created Successfully" });
   } else {

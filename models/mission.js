@@ -6,6 +6,7 @@ const missionSchema = mongoose.Schema({
   planet1: {type:[{NAME:{type:String},URL:{type:String}}]},
   planet2: {type:[{NAME:{type:String},URL:{type:String}}]},
   planet3: {type:[{NAME:{type:String},URL:{type:String}}]},
+  planet4: {type:[{NAME:{type:String},URL:{type:String}}]},
 });
 
 missionSchema.plugin(uniqueValidator);
