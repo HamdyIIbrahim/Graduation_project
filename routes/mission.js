@@ -1,39 +1,59 @@
 const express = require("express");
 const router = express.Router();
-const Mission = require('../models/mission');
+const Mission = require("../models/mission");
 
-router.get('/',async (req,res)=>{
-    try{
-        const Missions = await Mission.find();
-    if(Missions){
-        res.status(200).json(Missions);
-    }else{
-        res.status(500).send({ message: "No missions found" });
+router.get("/", async (req, res) => {
+  try {
+    const Missions = await Mission.find();
+    if (Missions) {
+      res.status(200).json(Missions);
+    } else {
+      res.status(500).send({ message: "No missions found" });
     }
-    }catch (err) {
-        console.error(err);
-        res.status(500).send({ message: "Server error" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Server error" });
+  }
+});
+router.get("/missionlist", async (req, res) => {
+  try {
+    const Missions = await Mission.find();
+    if (Missions) {
+      const newArrayData = Missions[0];
+      let missionsList = [];
+      for (let i = 1; i <= 3; i++) {
+        for (let j = 0; j < newArrayData[`planet${i}`].length; j++) {
+          missionsList.push(newArrayData[`planet${i}`][j]);
+        }
+      }
+      res.status(200).json(missionsList);
+    } else {
+      res.status(500).send({ message: "No missions found" });
     }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: "Server error" });
+  }
 });
 
-router.post('/newmission',async (req,res)=>{
-    const {grade,missions}=req.body;
-    const NewMisson = await Mission.create({grade,missions});
-    if(NewMisson){
-        res.status(200).json({ message:"Mission Created Successfully"});
-    }else{
-        res.status(500).send({ message: "Can't create the mission" });
-    }
+router.post("/newmission", async (req, res) => {
+  const { grade, planet1, planet2, planet3 } = req.body;
+  const NewMisson = await Mission.create({ grade, planet1, planet2, planet3 });
+  if (NewMisson) {
+    res.status(200).json({ message: "Mission Created Successfully" });
+  } else {
+    res.status(500).send({ message: "Can't create the mission" });
+  }
 });
 
-router.delete("/deletemission",async (req,res)=>{
-    const {Id} = req.body;
-    const deletemission = await Mission.findByIdAndDelete(Id);
-    if(deletemission){
-        res.status(200).json({ message:"Mission deleted Successfully"});
-    }else{
-        res.status(500).send({ message: "Can't delete the mission" });
-    }
+router.delete("/deletemission", async (req, res) => {
+  const { Id } = req.body;
+  const deletemission = await Mission.findByIdAndDelete(Id);
+  if (deletemission) {
+    res.status(200).json({ message: "Mission deleted Successfully" });
+  } else {
+    res.status(500).send({ message: "Can't delete the mission" });
+  }
 });
 
-module.exports=router;
+module.exports = router;
