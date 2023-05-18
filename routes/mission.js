@@ -19,11 +19,13 @@ router.get("/missionlist", async (req, res) => {
   try {
     const Missions = await Mission.find();
     if (Missions) {
-      const newArrayData = Missions[0];
       let missionsList = [];
-      for (let i = 1; i <= 3; i++) {
-        for (let j = 0; j < newArrayData[`planet${i}`].length; j++) {
-          missionsList.push(newArrayData[`planet${i}`][j]);
+      for (let k = 0; k < Missions.length; k++) {
+        const newArrayData = Missions[k];
+        for (let i = 1; i <= 3; i++) {
+          for (let j = 0; j < newArrayData[`planet${i}`].length; j++) {
+            missionsList.push(newArrayData[`planet${i}`][j]);
+          }
         }
       }
       res.status(200).json(missionsList);
